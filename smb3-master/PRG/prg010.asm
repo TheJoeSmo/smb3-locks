@@ -1552,93 +1552,46 @@ PRG010_C7BA:
 
     ; Indexed by value from FortressFX_Wx
     ;               0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F   10
-FortressFX_VAddrH:  .byte $29, $2A, $2A, $29, $29, $29, $29, $29, $29, $28, $29, $29, $29, $29, $29, $29, $29
-FortressFX_VAddrL:  .byte $48, $50, $12, $4C, $06, $96, $86, $8E, $9A, $92, $8A, $1A, $CE, $10, $52, $98, $CA
+
+FortressFX_VAddrH:
+    .include "map/asm/lock_destroy_vaddr_hi.asm"
+FortressFX_VAddrL:
+    .include "map/asm/lock_destroy_vaddr_lo.asm"
 
     ; Indexed by value from FortressFX_Wx
     ; Stores the column index for Map_Completions followed by which
     ; bit of Map_Completions is to be set to "clear" whatever lock
     ; is now busted or bridge constructed...
+; Completing a block/level
 FortressFX_MapCompIdx:
-    .byte $04, $10  ; 0
-    .byte $08, $01  ; 1
-    .byte $09, $02  ; 2
-    .byte $16, $10  ; 3
-    .byte $13, $20  ; 4
-    .byte $0B, $08  ; 5
-    .byte $03, $08  ; 6
-    .byte $17, $08  ; 7
-    .byte $0D, $08  ; 8
-    .byte $19, $80  ; 9
-    .byte $25, $08  ; A
-    .byte $0D, $20  ; B
-    .byte $17, $04  ; C
-    .byte $08, $20  ; D
-    .byte $19, $10  ; E
-    .byte $2C, $08  ; F
-    .byte $35, $04  ; 10
+    .include "map/asm/map_complete_index.asm"
 
     ; Indexed by value from FortressFX_Wx
     ; Patterns to overwrite to cause the disappearance of a lock
     ; or creation of a bridge, whatever is appropriate
-FortressFX_Patterns:
-    .byte $FE, $C0, $FE, $C0    ; 0
-    .byte $FE, $C0, $FE, $C0    ; 1
-    .byte $FE, $FE, $E1, $E1    ; 2
-    .byte $FE, $C0, $FE, $C0    ; 3
-    .byte $FE, $FE, $E1, $E1    ; 4
-    .byte $D4, $D6, $D5, $D7    ; 5
-    .byte $D4, $D6, $D5, $D7    ; 6
-    .byte $FE, $FE, $E1, $E1    ; 7
-    .byte $FE, $FE, $E1, $E1    ; 8
-    .byte $D4, $D6, $D5, $D7    ; 9
-    .byte $FE, $FE, $E1, $E1    ; A
-    .byte $FE, $C0, $FE, $C0    ; B
-    .byte $FE, $FE, $E1, $E1    ; C
-    .byte $FE, $C0, $FE, $C0    ; D
-    .byte $FE, $FE, $E1, $E1    ; E
-    .byte $FF, $FF, $FF, $FF    ; F (Makes an all black square in the dark)
-    .byte $FE, $FE, $E1, $E1    ; 10
+; Graphics data
+
+
 
     ; Indexed by value from FortressFX_Wx
     ; The related "row" for the FortressFX_MapLocation
 FortressFX_MapLocationRow:
-    .byte $50, $90, $80, $50, $40, $60, $60, $60, $60, $20, $60, $40, $70, $40, $50, $60, $70
+    .include "map/asm/lock_location_y.asm"
 
     ; Indexed by value from FortressFX_Wx
     ; Selects location of tile to bust out
     ; Lower 4 bits are the "screen", upper 4 bits are the column
 FortressFX_MapLocation:
-    .byte $40, $80, $90, $61, $31, $B0, $30, $71, $D0, $91, $52, $D0, $71, $80, $91, $C2, $53
+    .include "map/asm/lock_location_x.asm"
 
 FortressFX_MapTileReplace:
-    .byte $46, $46, $45, $46, $45, $B3, $B3, $DA, $DA, $B3, $45, $46, $45, $46, $45, $46, $45
+    .include "map/asm/lock_replace_block.asm"
 
-    ; Defines slots for post-Mini-Fortress events; since this is looked up
-    ; by an index table (FortressFXBase_ByWorld), there's no need for this
-    ; to be precisely four in every world, but that's what they allocated...
-FortressFX_W1:  .byte $00, $00, $00, $00
-FortressFX_W2:  .byte $01, $00, $00, $00
-FortressFX_W3:  .byte $02, $03, $00, $00
-FortressFX_W4:  .byte $04, $05, $00, $00
-FortressFX_W5:  .byte $06, $07, $00, $00
-FortressFX_W6:  .byte $08, $09, $0A, $00
-FortressFX_W7:  .byte $0B, $0C, $00, $00
-FortressFX_W8:  .byte $0D, $0E, $0F, $10
+LockPatternLookup:
+    .include "map/asm/lock_pattern_lockup.asm"
 
-
-FortressFXBase_ByWorld:
-    .byte FortressFX_W1 - FortressFX_W1    ; World 1
-    .byte FortressFX_W2 - FortressFX_W1    ; World 2
-    .byte FortressFX_W3 - FortressFX_W1    ; World 3
-    .byte FortressFX_W4 - FortressFX_W1    ; World 4
-    .byte FortressFX_W5 - FortressFX_W1    ; World 5
-    .byte FortressFX_W6 - FortressFX_W1    ; World 6
-    .byte FortressFX_W7 - FortressFX_W1    ; World 7
-    .byte FortressFX_W8 - FortressFX_W1    ; World 8
-
-    ; Kept going in the series... how many worlds did they think they'd need??
-    .byte $20, $24, $28, $2C, $30, $34, $38, $3C, $40
+LockPatterns:
+    .include "map/asm/lock_destroyed_patterns.asm"
 
 
 
@@ -1678,15 +1631,14 @@ PRG010_C8CD:
     LDA #SND_LEVELPOOF
     STA Sound_QLevel1
 
-    LDY World_Num    ; Y = World_Num
-
-    LDA FortressFXBase_ByWorld,Y    ; Get base index for this world
+; World_Num * 16 + Boom_Boom_Offset
+    LDA World_Num    ; Y = World_Num
     CLC
+    ASL A
+    ASL A 
+    ASL A 
+    ASL A  
     ADC Map_DoFortressFX        ; Add specific index
-    TAY      ; -> 'Y'
-
-    ; Reassign Map_DoFortressFX to the retrieved slot index
-    LDA FortressFX_W1,Y
     STA Map_DoFortressFX
 
     ; Set poof counter
@@ -1715,17 +1667,36 @@ PRG010_C8CD:
     STA Graphics_Buffer,Y
     INY      ; Y++ (next byte in graphics buffer)
 
-    LDA Map_DoFortressFX
-    ASL A
-    ASL A
-    TAX      ; X = Map_DoFortressFX * 4 (four 8x8 tiles per Map_DoFortressFX index)
+;
+; Looking for 4 bytes for each
+; Look for 1 byte for each that references the 4 bytes
+; Look for 1/2 byte for each (64 bytes total (512 - 64))
+;
 
-    LDA FortressFX_Patterns,X   ; Get pattern
+    LDA Map_DoFortressFX
+    CLC
+    ROR A
+    TAX     ; Lookup value for pattern
+    LDA LockPatternLookup, X
+    BCC +
+; Odd offset
+    AND #%00001111
+    ASL A 
+    ASL A
+    JMP ++    
++
+    AND #%11110000
+    LSR A 
+    LSR A
+++
+; The index is found (16 combos)
+    TAX
+    LDA LockPatterns,X   ; Get pattern
     STA Graphics_Buffer,Y       ; Store into graphics buffer
     INX      ; X++ (next pattern)
     INY      ; Y++ (next byte in graphics buffer)
 
-    LDA FortressFX_Patterns,X   ; Get pattern
+    LDA LockPatterns,X   ; Get pattern
     STA Graphics_Buffer,Y       ; Store into graphics buffer
     INX      ; X++ (next pattern)
     INY      ; Y++ (next byte in graphics buffer)
@@ -1753,12 +1724,12 @@ PRG010_C8CD:
     STA Graphics_Buffer,Y
     INY      ; Y++ (next byte in graphics buffer)
 
-    LDA FortressFX_Patterns,X   ; Get pattern
+    LDA LockPatterns,X   ; Get pattern
     STA Graphics_Buffer,Y       ; Store into graphics buffer
     INY      ; Y++ (next byte in graphics buffer)
     INX      ; X++ (next pattern)
 
-    LDA FortressFX_Patterns,X   ; Get pattern
+    LDA LockPatterns,X   ; Get pattern
     STA Graphics_Buffer,Y       ; Store into graphics buffer
     INY      ; Y++ (next byte in graphics buffer)
 

@@ -1158,10 +1158,6 @@ PRG003_A5EF:
 PRG003_A5F8:
     RTS      ; Return
 
-    ; Unused data I think?  Possibly was for the twirling shell
-PRG003_A5F9:
-    .byte $00, $40, $00, $00, $40, $40, $00, $40
-
 TwirlShell_Draw:
     JSR Object_SetHFlipByXVel ; Set horizontal flip by travel direction
 
@@ -1974,7 +1970,16 @@ ObjInit_BoomBoom:
     ; Set Var4 to Boom Boom's Y Hi -- this will select which value goes into Map_DoFortressFX
     ; So if Boom Boom's Y Hi is 1, then Map_DoFortressFX = 1, etc.
     ; The actual assignment to Map_DoFortressFX is done with the (?) ball after Boom Boom is defeated
-    LDA Objects_YHi,X
+    
+    ; 0b00xx.xyyy
+    ; lock_to_bust = ((xlo & 0b0111) << 3) || yhi
+    LDA Objects_X,X
+    AND #%00000111
+    CLC 
+    ASL A 
+    ASL A 
+    ASL A 
+    ORA Objects_YHi,X
     STA Objects_Var4,X
 
     ; Boom Boom will always appear at Y Hi = 1 (since this was used as a parameter)

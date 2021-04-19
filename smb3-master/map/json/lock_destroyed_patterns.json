@@ -1,0 +1,6 @@
+{
+"upward_path": ["$FE", "$C0", "$FE", "$C0"],
+"sideways_path": ["$FE", "$FE", "$E1", "$E1"],
+"bridge": ["$D4", "$D6", "$D5", "$D7"],
+"blank": ["$FF", "$FF", "$FF", "$FF"]
+}
